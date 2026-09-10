@@ -9,6 +9,7 @@ export function ModelViewport({ model }: { model?: ModelArtifact }) {
   useEffect(() => {
     const host = hostRef.current;
     if (!host) return;
+    const hostElement: HTMLDivElement = host;
 
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(0x0b1118);
@@ -20,7 +21,7 @@ export function ModelViewport({ model }: { model?: ModelArtifact }) {
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.shadowMap.enabled = true;
-    host.appendChild(renderer.domElement);
+    hostElement.appendChild(renderer.domElement);
 
     scene.add(new THREE.HemisphereLight(0xffffff, 0x26313f, 2.1));
     const key = new THREE.DirectionalLight(0xffffff, 2.8);
@@ -34,15 +35,15 @@ export function ModelViewport({ model }: { model?: ModelArtifact }) {
     scene.add(root);
 
     function resize() {
-      const width = Math.max(1, host.clientWidth);
-      const height = Math.max(1, host.clientHeight);
+      const width = Math.max(1, hostElement.clientWidth);
+      const height = Math.max(1, hostElement.clientHeight);
       renderer.setSize(width, height, false);
       camera.aspect = width / height;
       camera.updateProjectionMatrix();
     }
     resize();
     const observer = new ResizeObserver(resize);
-    observer.observe(host);
+    observer.observe(hostElement);
 
     let disposed = false;
     if (model?.remoteUrl) {
@@ -76,7 +77,9 @@ export function ModelViewport({ model }: { model?: ModelArtifact }) {
       cancelAnimationFrame(frame);
       observer.disconnect();
       renderer.dispose();
-      host.removeChild(renderer.domElement);
+      if (renderer.domElement.parentElement === hostElement) {
+        hostElement.removeChild(renderer.domElement);
+      }
       scene.traverse(obj => {
         const mesh = obj as THREE.Mesh;
         if (mesh.geometry) mesh.geometry.dispose();
