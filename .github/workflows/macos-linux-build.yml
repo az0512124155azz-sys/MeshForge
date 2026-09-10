@@ -2,7 +2,7 @@ name: macOS and Linux Build
 
 on:
   push:
-    branches: [main, "feature/**"]
+    branches: [main]
   pull_request:
     branches: [main]
 
