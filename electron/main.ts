@@ -20,8 +20,7 @@ async function createWindow() {
     }
   });
 
-  const devUrl = process.env.VITE_DEV_SERVER_URL;
-  if (devUrl) await mainWindow.loadURL(devUrl);
+  if (!app.isPackaged) await mainWindow.loadURL("http://127.0.0.1:5173");
   else await mainWindow.loadFile(path.join(__dirname, "../dist/index.html"));
 }
 
