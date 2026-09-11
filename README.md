@@ -8,6 +8,8 @@ MeshForge is a professional desktop workstation for creating, refining, preparin
 
 The easiest way to install MeshForge is from **GitHub Releases**. You do not need Node.js, npm, or the source code when using a release installer.
 
+Only installable packages are published. Portable ZIP archives are intentionally not included.
+
 ### Windows
 
 1. Open the repository **Releases** section.
@@ -23,7 +25,7 @@ The current preview is not code-signed, so Windows SmartScreen may display a war
 Use this build for Apple M1, M2, M3, M4 and later Apple Silicon Macs.
 
 1. Open **Releases**.
-2. Download the macOS `arm64` `.dmg` file.
+2. Download the macOS `arm64` `.dmg` installer.
 3. Open the DMG.
 4. Drag **MeshForge** into **Applications**.
 5. Open MeshForge from Applications.
@@ -31,14 +33,12 @@ Use this build for Apple M1, M2, M3, M4 and later Apple Silicon Macs.
 ### macOS — Intel
 
 1. Open **Releases**.
-2. Download the macOS `x64` `.dmg` file.
+2. Download the macOS `x64` `.dmg` installer.
 3. Open the DMG.
 4. Drag **MeshForge** into **Applications**.
 5. Open MeshForge from Applications.
 
 The current macOS preview is not Apple-notarized. macOS may therefore block the first launch. If that happens, verify that the file came from this repository and use the macOS Privacy & Security controls to allow the app.
-
-The release also contains `.zip` macOS builds for users who prefer a portable archive.
 
 ### Linux — AppImage
 
@@ -51,7 +51,7 @@ chmod +x MeshForge-*.AppImage
 
 ### Linux — Debian / Ubuntu
 
-Download the `.deb` package and run:
+Download the `.deb` installer and run:
 
 ```bash
 sudo apt install ./meshforge_*.deb
@@ -185,11 +185,15 @@ npm run dev
 npm run dist:win
 ```
 
+Produces a Windows NSIS `.exe` installer in `release/`.
+
 ### Build macOS
 
 ```bash
 npm run dist:mac
 ```
+
+Produces `.dmg` installers for Apple Silicon and Intel in `release/`.
 
 ### Build Linux
 
@@ -197,11 +201,11 @@ npm run dist:mac
 npm run dist:linux
 ```
 
-Generated installers are written to the local `release/` directory.
+Produces `.deb` and `.AppImage` installer packages in `release/`.
 
 ## Automated builds
 
-GitHub Actions builds and verifies MeshForge on Windows, macOS and Linux. Release builds collect the final platform installers and publish them together in GitHub Releases so users do not need to search through individual Actions artifacts.
+GitHub Actions builds and verifies MeshForge on Windows, macOS and Linux. Release builds collect only installable platform packages and publish them together in GitHub Releases so users do not need to search through individual Actions artifacts or unpack ZIP archives.
 
 ## UI direction
 
