@@ -33,9 +33,8 @@ jobs:
       - name: Upload Windows installer
         uses: actions/upload-artifact@v4
         with:
-          name: windows-installers
-          path: |
-            release/*.exe
+          name: windows-installer
+          path: release/*.exe
           if-no-files-found: error
           retention-days: 30
 
@@ -63,9 +62,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: macos-installers
-          path: |
-            release/*.dmg
-            release/*.zip
+          path: release/*.dmg
           if-no-files-found: error
           retention-days: 30
 
@@ -131,10 +128,11 @@ jobs:
             - Ubuntu / Debian: `.deb`
             - Other supported x64 Linux systems: `.AppImage`
 
+            Only installable packages are published here; portable ZIP archives are intentionally excluded.
+
             This is a development preview. The desktop application is installable, while the complete TRELLIS.2, NVIDIA, Blender MCP and printer pipeline is still under active integration.
           files: |
-            release-assets/windows-installers/*.exe
+            release-assets/windows-installer/*.exe
             release-assets/macos-installers/*.dmg
-            release-assets/macos-installers/*.zip
             release-assets/linux-installers/*.AppImage
             release-assets/linux-installers/*.deb
