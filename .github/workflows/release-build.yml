@@ -102,6 +102,14 @@ jobs:
       - build-macos
       - build-linux
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Read app version
+        id: version
+        shell: bash
+        run: echo "version=$(node -p \"require('./package.json').version\")" >> "$GITHUB_OUTPUT"
+
       - name: Download all installers
         uses: actions/download-artifact@v4
         with:
@@ -113,13 +121,15 @@ jobs:
       - name: Publish preview release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v0.3.0-preview.${{ github.run_number }}
+          tag_name: v${{ steps.version.outputs.version }}-preview.${{ github.run_number }}
           target_commitish: ${{ github.sha }}
-          name: MeshForge v0.3.0 Preview ${{ github.run_number }}
+          name: MeshForge v${{ steps.version.outputs.version }} Preview ${{ github.run_number }}
           prerelease: true
           fail_on_unmatched_files: true
           body: |
             MeshForge cross-platform development preview.
+
+            Version: `${{ steps.version.outputs.version }}`
 
             Choose the installer for your system:
             - Windows: `.exe`
