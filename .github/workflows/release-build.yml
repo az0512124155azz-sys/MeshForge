@@ -1,0 +1,140 @@
+name: Release Installers
+
+on:
+  push:
+    branches:
+      - feature/serious-pipeline-v1
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-windows:
+    name: Build Windows installer
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build Windows installer
+        run: npm run dist:win
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: "false"
+
+      - name: Upload Windows installer
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-installers
+          path: |
+            release/*.exe
+          if-no-files-found: error
+          retention-days: 30
+
+  build-macos:
+    name: Build macOS installers
+    runs-on: macos-15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build macOS installers
+        run: npm run dist:mac
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: "false"
+
+      - name: Upload macOS installers
+        uses: actions/upload-artifact@v4
+        with:
+          name: macos-installers
+          path: |
+            release/*.dmg
+            release/*.zip
+          if-no-files-found: error
+          retention-days: 30
+
+  build-linux:
+    name: Build Linux installers
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build Linux installers
+        run: npm run dist:linux
+
+      - name: Upload Linux installers
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-installers
+          path: |
+            release/*.AppImage
+            release/*.deb
+          if-no-files-found: error
+          retention-days: 30
+
+  publish-release:
+    name: Publish GitHub Release
+    runs-on: ubuntu-latest
+    needs:
+      - build-windows
+      - build-macos
+      - build-linux
+    steps:
+      - name: Download all installers
+        uses: actions/download-artifact@v4
+        with:
+          path: release-assets
+
+      - name: List release files
+        run: find release-assets -type f -maxdepth 3 -print
+
+      - name: Publish preview release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v0.3.0-preview.${{ github.run_number }}
+          target_commitish: ${{ github.sha }}
+          name: MeshForge v0.3.0 Preview ${{ github.run_number }}
+          prerelease: true
+          fail_on_unmatched_files: true
+          body: |
+            MeshForge cross-platform development preview.
+
+            Choose the installer for your system:
+            - Windows: `.exe`
+            - macOS Apple Silicon: `arm64.dmg`
+            - macOS Intel: `x64.dmg`
+            - Ubuntu / Debian: `.deb`
+            - Other supported x64 Linux systems: `.AppImage`
+
+            This is a development preview. The desktop application is installable, while the complete TRELLIS.2, NVIDIA, Blender MCP and printer pipeline is still under active integration.
+          files: |
+            release-assets/windows-installers/*.exe
+            release-assets/macos-installers/*.dmg
+            release-assets/macos-installers/*.zip
+            release-assets/linux-installers/*.AppImage
+            release-assets/linux-installers/*.deb
